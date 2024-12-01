@@ -22,10 +22,17 @@ export const setTotalRows = (rows) => {
   totalRows.textContent = rows + ' rows';
 };
 
-export function updateTableUI({ data, rowsAffected }, tableContainer, totalRows, affectedRows) {
+export function updateTableUI(
+  { data, rowsAffected },
+  tableContainer,
+  totalRows = null,
+  affectedRows = null,
+) {
   const table = createTable(data);
   tableContainer.innerHTML = table;
-  totalRows.textContent = data.length + ' rows';
+  if (totalRows) {
+    totalRows.textContent = data.length + ' rows';
+  }
   if (affectedRows) {
     affectedRows.textContent = rowsAffected + ' rows affected';
   }

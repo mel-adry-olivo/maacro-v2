@@ -102,7 +102,13 @@ export const fetchCleanedData = async (tableData, options) => {
 };
 
 export const getCleanseOptions = () => {
-  const method = document.querySelector('input[type="radio"][name="missing"]:checked').value;
+  let method = document.querySelector('input[type="radio"][name="missing"]:checked');
+  if (!method) {
+    method = '';
+  } else {
+    method = method.value;
+  }
+
   const missingOptions = {
     method: method,
   };

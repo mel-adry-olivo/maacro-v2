@@ -1,5 +1,6 @@
 .flex {
   display: flex;
+  gap: 0.5rem;
 }
 
 .flex-col {
@@ -20,4 +21,22 @@
 
 .pointer {
   cursor: pointer;
+}
+
+.flow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.no-margin {
+  margin: 0 !important;
+}
+
+.margin-top {
+  margin-top: 0.5rem !important;
 }

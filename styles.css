@@ -328,7 +328,7 @@ td:hover {
   display: inline-flex;
   flex-direction: column;
   gap: 0.35rem;
-  margin-top: 1rem;
+  margin-top: 0.75rem;
   width: 100%;
 
   & svg {
@@ -440,4 +440,22 @@ select {
 .snackbar.show {
   opacity: 0.95;
   transform: translateX(0);
+}
+
+.dropdown-group.merge {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dropdown-group.merge .file {
+  display: flex;
+  font-size: 0.85rem;
+  gap: 0.5rem;
+  align-items: center;
+
+  & svg {
+    height: 24px;
+    width: 24px;
+  }
 }

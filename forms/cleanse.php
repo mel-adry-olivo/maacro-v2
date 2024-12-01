@@ -18,7 +18,7 @@ $tools = [
 
 <h2>Cleanse</h2>
 <div class="dropdown-group missing">
-    <?php createRadioGroup($missingData, 'missing', 'Handle missing data')?>
+    <?php createRadioGroup($missingData, 'missing', 'Handle missing data', false)?>
     <div class="dropdown dropdown-impute">
         <div class="dropdown-wrapper">
             <div class="input-container">

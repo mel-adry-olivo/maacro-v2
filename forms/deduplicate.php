@@ -3,7 +3,7 @@
 include '../components/components.php';
 
 $criteria = [
-    'All' => 'rows-3',
+    'All Columns' => 'rows-3',
     'Column' => 'columns-3'
 ];
 

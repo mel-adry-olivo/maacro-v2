@@ -1,8 +1,10 @@
-import { initPageOverlay, show, hide, setTotalRows } from './js/utils.js';
-import { getTableData, getTableLength } from './js/holy-table.js';
+import { initPageOverlay, show, setTotalRows } from './js/utils.js';
+import { getTableLength } from './js/holy-table.js';
 import { handleDeduplicate } from './js/holy-deduplicate.js';
 import { handleCleanse } from './js/holy-cleanse.js';
-import { handleRevise, initHeaders } from './js/holy-revise.js';
+import { initHeaders } from './js/holy-revise.js';
+import { handleMerge } from './js/holy-merge.js';
+import { handleJoin } from './js/holy-join.js';
 
 const formButtons = document.querySelectorAll('.btn-form');
 const pageOverlay = document.querySelector('.page-overlay');
@@ -18,6 +20,10 @@ export async function showForm(btn) {
     handleDeduplicate();
   } else if (content === 'cleanse') {
     handleCleanse();
+  } else if (content === 'merge') {
+    handleMerge();
+  } else if (content === 'join') {
+    handleJoin();
   }
   lucide.createIcons();
 }

@@ -31,6 +31,7 @@ $csv = json_decode(file_get_contents('./test2.json'), true);
                 renderFormButton("Deduplicate", "copy");
                 renderFormButton("Cleanse", "eraser");
                 renderFormButton("Merge", "merge");
+                renderFormButton("Join", "between-vertical-end");
                 renderFormButton("Derive", "plus");
                 renderFormButton("Aggregate", "eraser");
                 renderFormButton("Visualize", "eye");

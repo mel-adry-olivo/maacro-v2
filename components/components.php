@@ -25,10 +25,9 @@ function renderButton($text, $icon, $filled = false) {
     HTML;
 }
 
-function createRadioGroup($array, $name, $legend) {
+function createRadioGroup($array, $name, $legend, $first = true) {
 
     $html = '';
-    $first = true;
 
     foreach ($array as $key => $value) {
 

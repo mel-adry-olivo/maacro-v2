@@ -79,7 +79,7 @@ export async function fetchDeduplicatedData(tableData, options) {
 }
 
 export function getDeduplicateOptions() {
-  const subset = document.querySelector('input[name="subset"]:checked').value;
+  let subset = document.querySelector('input[name="subset"]:checked').value;
   const keep = document.querySelector('input[name="keep"]:checked').value;
 
   if (subset === 'column') {

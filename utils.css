@@ -1,0 +1,23 @@
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fill-space {
+  flex: 1;
+  height: 100%;
+  width: 100%;
+}
+
+.pointer {
+  cursor: pointer;
+}

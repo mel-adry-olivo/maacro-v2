@@ -1,0 +1,51 @@
+[
+  {
+    "StudID": 1,
+    "StudName": "John",
+    "Sex": "Male",
+    "StudGradeCS103": 85,
+    "Birthdate": "2000-01-01"
+  },
+  {
+    "StudID": 2,
+    "StudName": "Jane",
+    "Sex": "Female",
+    "StudGradeCS103": 90,
+    "Birthdate": "2001-02-02"
+  },
+  {
+    "StudID": 3,
+    "StudName": "Bob",
+    "Sex": "Male",
+    "StudGradeCS103": null,
+    "Birthdate": "2002-03-03"
+  },
+  {
+    "StudID": 4,
+    "StudName": "Alice",
+    "Sex": "Female",
+    "StudGradeCS103": 95,
+    "Birthdate": ""
+  },
+  {
+    "StudID": 5,
+    "StudName": "Mike",
+    "Sex": "Male",
+    "StudGradeCS103": 80,
+    "Birthdate": "2004-05-05"
+  },
+  {
+    "StudID": 6,
+    "StudName": "Emma",
+    "Sex": "Female",
+    "StudGradeCS103": 92,
+    "Birthdate": "2005-06-06"
+  },
+  {
+    "StudID": 7,
+    "StudName": "Tom",
+    "Sex": "Male",
+    "StudGradeCS103": 88,
+    "Birthdate": "2006-07-07"
+  }
+]

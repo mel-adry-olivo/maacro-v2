@@ -6,6 +6,7 @@ import { initHeaders } from './js/holy-revise.js';
 import { handleMerge } from './js/holy-merge.js';
 import { handleJoin } from './js/holy-join.js';
 import { handleStatistics } from './js/holy-statistics.js';
+import { handleVisualize } from './js/holy-visualize.js';
 
 const formButtons = document.querySelectorAll('.btn-form');
 const pageOverlay = document.querySelector('.page-overlay');
@@ -33,6 +34,9 @@ export async function showForm(btn) {
       break;
     case 'statistics':
       handleStatistics();
+      break;
+    case 'visualize':
+      handleVisualize();
       break;
   }
 

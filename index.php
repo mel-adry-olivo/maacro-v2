@@ -34,6 +34,7 @@ $csv = json_decode(file_get_contents('./test.json'), true);
                 renderFormButton("Join", "between-vertical-end");
                 renderFormButton("Derive", "plus");
                 renderFormButton("Statistics", "hash");      
+                renderFormButton("Visualize", "eye");
                 ?>
             </div>
             <div class="toolbar-right">

@@ -3,7 +3,7 @@
 
 require './components/components.php';  
 
-$csv = json_decode(file_get_contents('./test.json'), true);
+$csv = json_decode(file_get_contents('./test2.json'), true);
 
 ?>
 
@@ -52,6 +52,7 @@ $csv = json_decode(file_get_contents('./test.json'), true);
         <div class="preview-container">
             <h3>Preview</h3>
             <div class="table-container"></div>
+            <div class="plot-container"></div>
             <div class="text-wrapper">
                 <span class="total-rows"></span>
                 <span class="affected-rows"></span>

@@ -42,6 +42,14 @@ export const handleVisualize = () => {
     }
   });
 
+  document
+    .querySelector('input[type="checkbox"][data-value="scatter"]')
+    .addEventListener('click', (event) => {
+      if (event.target.checked) {
+        showSnackbar('Reminder', 'Make sure to select two variables.');
+      }
+    });
+
   variableButton.addEventListener('click', () => {
     const columns = mainColumnGroup.querySelectorAll('.column');
     columns.forEach((col) => {
@@ -94,11 +102,44 @@ export const handleVisualize = () => {
   viewButton.addEventListener('click', async () => {
     const options = getVisualizeOptions(variableColumnGroup, splitColumnGroup, checkboxContainer);
     const tableData = getTableData(mainTable);
-    console.log(options);
+    const data = await fetchAggregatedData(tableData, options);
+
+    if (data.error) return showSnackbar('Visualization', data.error);
+
+    const base64Image = 'data:image/png;base64,' + Object.values(data.plots)[0];
+    const imgElement = document.createElement('img');
+    imgElement.className = 'table-image';
+    imgElement.src = base64Image;
+
+    const plotContainer = document.querySelector('.preview-container .plot-container');
+    plotContainer.innerHTML = '';
+    plotContainer.appendChild(imgElement);
+
+    showSnackbar('Visualization', data.message);
+    show(previewContainer);
   });
 };
 
-export const fetchAggregatedData = async (tableData, options) => {};
+export const fetchAggregatedData = async (tableData, options) => {
+  const formData = new FormData();
+  formData.append('tableData', JSON.stringify(tableData));
+  formData.append('options', JSON.stringify(options));
+  try {
+    const response = await fetch('http://localhost:5000/visualize', {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      throw new Error(errorResponse.error);
+    }
+
+    return await response.json();
+  } catch (error) {
+    return { error: error.message };
+  }
+};
 
 export const getVisualizeOptions = (variableColumnGroup, splitColumnGroup, checkboxContainer) => {
   const variableColumns = variableColumnGroup.querySelectorAll('.column');

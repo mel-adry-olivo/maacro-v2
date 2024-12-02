@@ -1,10 +1,12 @@
 import { handleDeduplicate } from './holy-deduplicate.js';
+import { previewContainer } from './holy-preview.js';
 import { createTable } from './holy-table.js';
 
 export const initPageOverlay = (pageOverlay) => {
   pageOverlay.addEventListener('click', (e) => {
     if (e.target === pageOverlay && pageOverlay.classList.contains('show')) {
       hide(pageOverlay);
+      hide(previewContainer);
     }
   });
 };

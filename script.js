@@ -7,6 +7,7 @@ import { handleMerge } from './js/holy-merge.js';
 import { handleJoin } from './js/holy-join.js';
 import { handleStatistics } from './js/holy-statistics.js';
 import { handleVisualize } from './js/holy-visualize.js';
+import { handleDerive } from './js/holy-derive.js';
 
 const formButtons = document.querySelectorAll('.btn-form');
 const pageOverlay = document.querySelector('.page-overlay');
@@ -37,6 +38,9 @@ export async function showForm(btn) {
       break;
     case 'visualize':
       handleVisualize();
+      break;
+    case 'derive':
+      handleDerive();
       break;
   }
 

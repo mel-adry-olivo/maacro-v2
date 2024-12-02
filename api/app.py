@@ -5,6 +5,10 @@ import re
 import os
 from io import StringIO
 import json
+import matplotlib.pyplot as plt
+import seaborn as sns
+import io
+import base64
 
 app = Flask(__name__)
 app.json.sort_keys = False
@@ -255,6 +259,14 @@ def join_data():
         'joinedData': joined_data_json
     })
 
+
+def handle_overlapping_columns(df1, df2, axis):
+    if axis == 1:
+        overlapping_cols = set(df1.columns) & set(df2.columns)
+        if overlapping_cols:
+            df2 = df2.rename(columns={col: f"{col}_2" for col in overlapping_cols})
+    return pd.concat([df1, df2], axis=axis)
+
 @app.route('/explore', methods=['POST'])
 def explore_data():
 
@@ -297,7 +309,6 @@ def explore_data():
         
         if splits:
             result = table_df.groupby(splits).agg(agg_dict).reset_index()
-            # Flatten column names
             result.columns = [' '.join(map(str, col)) if isinstance(col, tuple) else col for col in result.columns.values]
         else:
             result = table_df[variables].agg({var: [stat if stat != 'mode' else ('mode', lambda x: x.mode().iloc[0]) for stat in statistics] for var in variables}).T
@@ -314,13 +325,114 @@ def explore_data():
         return jsonify({'error': str(e)}), 400
 
 
-def handle_overlapping_columns(df1, df2, axis):
-    if axis == 1:
-        overlapping_cols = set(df1.columns) & set(df2.columns)
-        if overlapping_cols:
-            df2 = df2.rename(columns={col: f"{col}_2" for col in overlapping_cols})
-    return pd.concat([df1, df2], axis=axis)
+@app.route('/visualize', methods=['POST'])
+def visualize_data():
+    data = request.form
+    table_data = data.get('tableData')
+    json_data = StringIO(table_data)
 
+    options = data.get('options')
+    optionsDict = json.loads(options)
+
+    variables = optionsDict['variables']
+    splits = optionsDict['splits']
+    plots = optionsDict['plots']
+    
+    if not table_data or not variables or not plots:
+        return jsonify({'error': 'Missing required data, variables, or plots'}), 400
+
+    df = pd.read_json(json_data)
+    df = df.convert_dtypes()
+    
+    try:
+        plot_images = {}
+        for plot_type in plots:
+            for variable in variables:
+                if variable not in df.columns:
+                    return jsonify({'error': f'Column {variable} not found in table data'}), 400
+                if any(split not in df.columns for split in splits):
+                    return jsonify({'error': f"Column(s) {splits} not found in table data"}), 400
+
+                plt.figure(figsize=(10, 6))
+
+                if plot_type == 'bar':
+                    if not splits:
+                        plot_data = df[variable].value_counts()
+                        sns.barplot(x=plot_data.index, y=plot_data.values)
+                    else:
+                        sns.barplot(data=df, x=splits[0], y=variable)
+                elif plot_type == 'box':
+                    sns.boxplot(data=df, x=splits[0] if splits else variable, y=variable if splits else None)
+                elif plot_type == 'violin':
+                    sns.violinplot(data=df, x=splits[0] if splits else variable, y=variable if splits else None, split=True)
+                elif plot_type == 'scatter':
+                    if len(variables) < 2:
+                        return jsonify({'error': 'Scatter plots require at least two variables'}), 400
+                    sns.scatterplot(data=df, x=variables[0], y=variables[1], hue=splits[0] if splits else None)
+                elif plot_type == 'density':
+                    sns.kdeplot(data=df, x=variable, hue=splits[0] if splits else None, fill=True)
+                elif plot_type == 'histogram':
+                    sns.histplot(data=df, x=variable, hue=splits[0] if splits else None, kde=False)
+                else:
+                    return jsonify({'error': f'Invalid plot type: {plot_type}'}), 400
+
+                plt.title(f"{plot_type.capitalize()} Plot for {variable}")
+                plt.tight_layout()
+
+                img = io.BytesIO()
+                plt.savefig(img, format='png')
+                img.seek(0)
+                plt.close()
+
+                img_base64 = base64.b64encode(img.read()).decode('utf-8')
+                plot_images[f"{plot_type}_{variable}"] = img_base64
+
+        return jsonify({
+            'message': 'Visualization operation successful',
+            'plots': plot_images
+        })
+
+    except Exception as e:
+        return jsonify({'error': f"Visualization failed: {str(e)}"}), 500
+
+@app.route('/derive', methods=['POST'])
+def derive_data():
+    data = request.form
+    table_data = data.get('tableData')
+    json_data = StringIO(table_data)
+
+    df = pd.read_json(json_data)
+    df = df.convert_dtypes()
+
+    options = data.get('options')
+    optionsDict = json.loads(options)
+
+    operation = optionsDict['operation']
+    column1 = optionsDict['column1']
+    column2 = optionsDict['column2']
+    columnName = optionsDict['columnName']
+
+    if not table_data or not column1 or not column2 or not columnName:
+        return jsonify({'error': 'Missing required data'}), 400
+
+    try:
+        if operation == 'add':
+            df[columnName] = df[column1] + df[column2]
+        elif operation == 'subtract':
+            df[columnName] = df[column1] - df[column2]
+        elif operation == 'multiply':
+            df[columnName] = df[column1] * df[column2]
+        elif operation == 'divide':
+            df[columnName] = df[column1] / df[column2]
+        elif operation == 'concatenate':
+            df[columnName] = df[column1].astype(str) + df[column2].astype(str)
+        else:
+            return jsonify({'error': 'Invalid operation'}), 400
+
+        output = df.to_json(orient='records')
+        return jsonify({'derivedData': json.loads(output)})
+    except Exception as e:
+        return jsonify({'error': f"Derivation failed: {str(e)}"}), 500
 
 
 if __name__ == "__main__":

@@ -156,12 +156,19 @@ svg {
   color: var(--clr-bg);
 }
 
-.table-container {
+.table-container,
+.plot-container {
   height: 50%;
   overflow-x: auto;
   outline: 1px solid #ddd;
   scrollbar-width: thin;
   border-radius: 0.5rem;
+}
+
+.table-image {
+  aspect-ratio: auto;
+  width: 75%;
+  object-fit: contain;
 }
 
 table {
@@ -241,7 +248,7 @@ td:hover {
   gap: 1rem;
   border-radius: 1rem;
   will-change: auto;
-  max-height: 50vh;
+  max-height: 80vh;
   overflow-y: auto;
 
   & h3 {

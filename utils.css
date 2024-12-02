@@ -46,3 +46,7 @@
   flex-direction: row;
   gap: 0.5rem;
 }
+
+.gap-05 {
+  gap: 0.5rem;
+}

@@ -83,7 +83,7 @@ export const handleStatistics = () => {
       }
     });
 
-    if (splitColumnGroup.childElementCount >= 1) {
+    if (splitColumnGroup.childElementCount >= 1 || variableColumnGroup.childElementCount >= 1) {
       statisticsDropdown.classList.add('selected');
     } else {
       statisticsDropdown.classList.remove('selected');

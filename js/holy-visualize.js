@@ -19,6 +19,7 @@ export const handleVisualize = () => {
   const splitColumnGroup = document.querySelector('.column-group-split');
   const plotDropdown = document.querySelector('.dropdown-plot');
   const viewButton = document.querySelector('.btn[data-action="view"]');
+  const checkboxContainer = plotDropdown.querySelector('.checkbox-container');
 
   createExploreColumns(getTableColumns(mainTable), 'main');
 
@@ -83,19 +84,33 @@ export const handleVisualize = () => {
     });
 
     if (splitColumnGroup.childElementCount >= 1) {
-      statisticsDropdown.classList.add('selected');
+      plotDropdown.classList.add('selected');
     } else {
-      statisticsDropdown.classList.remove('selected');
+      plotDropdown.classList.remove('selected');
     }
   });
 
   cancelButton.addEventListener('click', () => hide(pageOverlay));
-  viewButton.addEventListener('click', async () => {});
+  viewButton.addEventListener('click', async () => {
+    const options = getVisualizeOptions(variableColumnGroup, splitColumnGroup, checkboxContainer);
+    const tableData = getTableData(mainTable);
+    console.log(options);
+  });
 };
 
 export const fetchAggregatedData = async (tableData, options) => {};
 
-export const getVisualizeOptions = () => {};
+export const getVisualizeOptions = (variableColumnGroup, splitColumnGroup, checkboxContainer) => {
+  const variableColumns = variableColumnGroup.querySelectorAll('.column');
+  const splitColumns = splitColumnGroup.querySelectorAll('.column');
+  const variables = Array.from(variableColumns).map((c) => c.textContent);
+  const splits = Array.from(splitColumns).map((c) => c.textContent);
+  const plots = Array.from(checkboxContainer.querySelectorAll('input[type="checkbox"]'))
+    .filter((c) => c.checked)
+    .map((c) => c.dataset.value);
+
+  return { variables, splits, plots };
+};
 
 export const createExploreColumns = (columns, action) => {
   columns.forEach((column) => {

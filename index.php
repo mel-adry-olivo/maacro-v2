@@ -1,9 +1,9 @@
 <?php
                                                                                                                                                                                                                                                                                                                                                                                            
 
-require './components/components.php';
+require './components/components.php';  
 
-$csv = json_decode(file_get_contents('./test2.json'), true);
+$csv = json_decode(file_get_contents('./test.json'), true);
 
 ?>
 
@@ -33,9 +33,7 @@ $csv = json_decode(file_get_contents('./test2.json'), true);
                 renderFormButton("Merge", "merge");
                 renderFormButton("Join", "between-vertical-end");
                 renderFormButton("Derive", "plus");
-                renderFormButton("Aggregate", "eraser");
-                renderFormButton("Visualize", "eye");
-                renderFormButton("Statistics", "bar-chart");           
+                renderFormButton("Statistics", "hash");      
                 ?>
             </div>
             <div class="toolbar-right">

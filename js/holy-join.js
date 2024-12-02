@@ -2,13 +2,7 @@ import { show, hide, updateTableUI, updateTableDataType } from './utils.js';
 import { createDropdown } from './dropdown.js';
 import { getTableColumns, getTableData } from './holy-table.js';
 import { showSnackbar } from './snackbar.js';
-import {
-  initPreview,
-  previewContainer,
-  previewTableContainer,
-  affectedRows,
-  totalRows,
-} from './holy-preview.js';
+import { initPreview, previewContainer, previewTableContainer } from './holy-preview.js';
 
 const pageOverlay = document.querySelector('.page-overlay');
 const mainTotalRows = document.querySelector('.total-rows');

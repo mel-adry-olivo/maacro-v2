@@ -4,6 +4,7 @@ import pandas as pd
 import re
 import os
 from io import StringIO
+import json
 
 app = Flask(__name__)
 app.json.sort_keys = False
@@ -253,6 +254,65 @@ def join_data():
     return jsonify({
         'joinedData': joined_data_json
     })
+
+@app.route('/explore', methods=['POST'])
+def explore_data():
+
+    data = request.form
+    table = data.get('tableData')
+    json_data = StringIO(table)
+    table_df = pd.read_json(json_data)
+
+    table_df = table_df.convert_dtypes()
+    options = data.get('options')
+    optionsDict = json.loads(options)
+
+    variables = optionsDict['variables']
+    splits = optionsDict['splits']
+    statistics = optionsDict['statistics']
+
+    if not statistics:
+        return jsonify({'error': 'No statistic selected. Please specify a statistic.'}), 400
+
+    try:
+        invalid_splits = [
+            col for col in splits
+            if pd.api.types.is_numeric_dtype(table_df[col])
+        ]
+        if invalid_splits:
+            return jsonify({
+                'error': f"Cannot use continuous data as splits: {invalid_splits}"
+            }), 400
+
+        agg_dict = {}
+        
+        for var in variables:
+            stats_list = []
+            for stat in statistics:
+                if stat == 'mode':
+                    stats_list.append(('mode', lambda x: x.mode().iloc[0]))
+                else:
+                    stats_list.append((stat, stat))
+            agg_dict[var] = stats_list
+        
+        if splits:
+            result = table_df.groupby(splits).agg(agg_dict).reset_index()
+            # Flatten column names
+            result.columns = [' '.join(map(str, col)) if isinstance(col, tuple) else col for col in result.columns.values]
+        else:
+            result = table_df[variables].agg({var: [stat if stat != 'mode' else ('mode', lambda x: x.mode().iloc[0]) for stat in statistics] for var in variables}).T
+            result.columns = [' '.join(map(str, col)) if isinstance(col, tuple) else col for col in result.columns.values]
+
+        output = result.to_json(orient='records')
+        return jsonify({'aggregatedData': json.loads(output)})
+    
+    except Exception as e:  
+        return jsonify({'error': str(e)}), 400
+
+    
+    except Exception as e:  
+        return jsonify({'error': str(e)}), 400
+
 
 def handle_overlapping_columns(df1, df2, axis):
     if axis == 1:

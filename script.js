@@ -5,6 +5,7 @@ import { handleCleanse } from './js/holy-cleanse.js';
 import { initHeaders } from './js/holy-revise.js';
 import { handleMerge } from './js/holy-merge.js';
 import { handleJoin } from './js/holy-join.js';
+import { handleStatistics } from './js/holy-statistics.js';
 
 const formButtons = document.querySelectorAll('.btn-form');
 const pageOverlay = document.querySelector('.page-overlay');
@@ -16,15 +17,25 @@ export async function showForm(btn) {
   const response = await fetch('./forms/' + content + '.php');
   const data = await response.text();
   document.querySelector('.form-container').innerHTML = data;
-  if (content === 'deduplicate') {
-    handleDeduplicate();
-  } else if (content === 'cleanse') {
-    handleCleanse();
-  } else if (content === 'merge') {
-    handleMerge();
-  } else if (content === 'join') {
-    handleJoin();
+
+  switch (content) {
+    case 'deduplicate':
+      handleDeduplicate();
+      break;
+    case 'cleanse':
+      handleCleanse();
+      break;
+    case 'merge':
+      handleMerge();
+      break;
+    case 'join':
+      handleJoin();
+      break;
+    case 'statistics':
+      handleStatistics();
+      break;
   }
+
   lucide.createIcons();
 }
 

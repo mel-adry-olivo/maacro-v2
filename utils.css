@@ -40,3 +40,9 @@
 .margin-top {
   margin-top: 0.5rem !important;
 }
+
+.row {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}

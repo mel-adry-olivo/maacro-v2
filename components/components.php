@@ -88,6 +88,20 @@ function createCheckboxGroup($array, $name, $legend) {
 
 
 function renderTable($data) {
+    if (empty($data)) {
+        echo
+        <<<HTML
+        <div class="table-container">
+            <div class="table-main">
+                <div class="no-data">
+                    <p>No data found</p>
+                </div>
+            </div>
+        </div>
+        HTML;
+        return;
+    }
+
     $headers = array_keys($data[0]);
     $headerHtml = '';
     foreach ($headers as $header) {
@@ -102,7 +116,6 @@ function renderTable($data) {
         }
         $rowHtml .= "</tr>";
     }
-
 
     echo
     <<<HTML

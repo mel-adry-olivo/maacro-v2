@@ -26,8 +26,8 @@ export const handleDerive = () => {
 
   cancelButton.addEventListener('click', () => hide(pageOverlay));
 
-  column1SelectContainer.appendChild(createDropdown(getTableColumns(mainTable), 'column1'));
-  column2SelectContainer.appendChild(createDropdown(getTableColumns(mainTable), 'column2'));
+  column1SelectContainer.appendChild(createDropdown(getTableColumns(), 'column1'));
+  column2SelectContainer.appendChild(createDropdown(getTableColumns(), 'column2'));
 
   previewButton.addEventListener('click', async () => {
     const data = await fetchDerivedData();
@@ -52,7 +52,7 @@ export const handleDerive = () => {
 
   const fetchDerivedData = async () => {
     const formData = new FormData();
-    const tableData = JSON.stringify(getTableData(mainTable));
+    const tableData = JSON.stringify(getTableData());
     const options = getDeriveOptions();
 
     formData.append('tableData', tableData);

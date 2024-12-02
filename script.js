@@ -1,5 +1,4 @@
 import { initPageOverlay, show, setTotalRows } from './js/utils.js';
-import { getTableLength } from './js/holy-table.js';
 import { handleDeduplicate } from './js/holy-deduplicate.js';
 import { handleCleanse } from './js/holy-cleanse.js';
 import { initHeaders } from './js/holy-revise.js';
@@ -8,11 +7,11 @@ import { handleJoin } from './js/holy-join.js';
 import { handleStatistics } from './js/holy-statistics.js';
 import { handleVisualize } from './js/holy-visualize.js';
 import { handleDerive } from './js/holy-derive.js';
+import { handleUpload } from './js/holy-upload.js';
+import { handleDownload } from './js/holy-download.js';
 
 const formButtons = document.querySelectorAll('.btn-form');
 const pageOverlay = document.querySelector('.page-overlay');
-const mainTotalRows = document.querySelector('.total-rows');
-const mainTable = document.querySelector('.table-main');
 
 export async function showForm(btn) {
   const content = btn.dataset.action;
@@ -42,6 +41,12 @@ export async function showForm(btn) {
     case 'derive':
       handleDerive();
       break;
+    case 'upload':
+      handleUpload();
+      break;
+    case 'download':
+      handleDownload();
+      break;
   }
 
   lucide.createIcons();
@@ -54,8 +59,5 @@ formButtons.forEach((btn) => {
   });
 });
 
-setTotalRows(getTableLength(mainTable));
 initPageOverlay(pageOverlay);
-initHeaders();
-
 lucide.createIcons();

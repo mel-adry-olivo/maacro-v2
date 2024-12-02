@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 import pandas as pd
 import re
@@ -8,6 +8,7 @@ import json
 import matplotlib.pyplot as plt
 import seaborn as sns
 import io
+from io import BytesIO
 import base64
 
 app = Flask(__name__)
@@ -35,24 +36,27 @@ def get_duplicates():
 
 @app.route("/deduplicate", methods=["POST"])
 def deduplicate():
-    data = request.get_json()
-    table_data = data.get("tableData", [])
 
-    df = pd.DataFrame(table_data)
+    data = request.form
+    table_data = data.get('tableData')
+    json_data = StringIO(table_data)
 
-    options = data.get("options", [])
-    if(options[0] == 'all-columns'):
-        options[0] = None
+    df = pd.read_json(json_data)
+    df = df.convert_dtypes()
+
+    options = data.get('options')
+    optionsDict = json.loads(options)
+
+    if(optionsDict[0] == 'all-columns'):
+        optionsDict[0] = None
     
-    if options:
-        deduplicated_df = df.drop_duplicates(subset=options[0], keep=options[1])
+    if optionsDict:
+        deduplicated_df = df.drop_duplicates(subset=optionsDict[0], keep=optionsDict[1])
     else:
         deduplicated_df = df.drop_duplicates()  
     
-    
     rows_removed = len(df) - len(deduplicated_df)
     deduplicated_data = deduplicated_df.to_dict(orient="records")
-
 
     response = jsonify({
         "deduplicatedData": deduplicated_data,
@@ -163,27 +167,45 @@ def reformat():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
-
-    file = request.files['file']
-
-    if file.filename == '':
+    file = request.files.get('file')
+    if not file or file.filename == '':
         return jsonify({'message': 'No selected file'}), 400
 
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)  # Ensure the upload folder exists
     file.save(file_path)
 
     table_data = request.form.get('tableData')
-    table_df = pd.DataFrame.from_records(eval(table_data))
+    table_df = None
+    if table_data:
+        try:
+            table_df = pd.DataFrame.from_records(eval(table_data))  # Convert to DataFrame
+        except Exception as e:
+            return jsonify({'message': 'Invalid tableData format', 'error': str(e)}), 400
 
-    if file.filename.endswith('.csv'):
-        df = pd.read_csv(file_path)
-    elif file.filename.endswith('.xlsx'):
-        df = pd.read_excel(file_path, engine='openpyxl')
+    try:
+        if file.filename.endswith('.csv'):
+            df = pd.read_csv(file_path)
+        elif file.filename.endswith('.xlsx'):
+            df = pd.read_excel(file_path, engine='openpyxl')
+        else:
+            return jsonify({'message': 'Unsupported file type'}), 400
+    except Exception as e:
+        return jsonify({'message': 'Error reading file', 'error': str(e)}), 500
 
-    matching_columns = list(set(df.columns).intersection(set(table_df.columns)))
+    matching_columns = []
+    if table_df is not None:
+        matching_columns = list(set(df.columns).intersection(set(table_df.columns)))
+
+    total_rows = len(df)
 
     data_json = df.to_dict(orient='records')
-    return jsonify({ 'data': data_json , 'filename': file.filename, 'matchingColumns': matching_columns }), 200
+    return jsonify({
+        'data': data_json,
+        'filename': file.filename,
+        'matchingColumns': matching_columns,
+        'totalRows': total_rows
+    }), 200
 
 @app.route('/merge', methods=['POST'])
 def merge_data():
@@ -433,6 +455,62 @@ def derive_data():
         return jsonify({'derivedData': json.loads(output)})
     except Exception as e:
         return jsonify({'error': f"Derivation failed: {str(e)}"}), 500
+
+@app.route('/download', methods=['POST'])
+def download_file():
+    data = request.form
+    table_data = data.get('tableData')
+    json_data = StringIO(table_data)
+
+    df = pd.read_json(json_data)
+    df = df.convert_dtypes()
+    
+    filetype = data.get('filetype', 'csv').lower()  
+    filetype = filetype.replace('"', '')
+
+    if filetype == 'csv':
+        csv_data = df.to_csv(index=False)
+        response = Response(
+            csv_data,
+            mimetype='text/csv',
+            headers={
+                'Content-Disposition': 'attachment;filename=data.csv'
+            }
+        )
+        return response
+    
+    elif filetype == 'xlsx':
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Sheet1')
+        
+        output.seek(0)
+        
+        response = Response(
+            output.getvalue(),
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            headers={
+                'Content-Disposition': 'attachment;filename=data.xlsx'
+            }
+        )
+        return response
+    
+    elif filetype == 'json':
+        json_data = df.to_json(orient='records')
+        response = Response(
+            json_data,
+            mimetype='application/json',
+            headers={
+                'Content-Disposition': 'attachment;filename=data.json'
+            }
+        )
+        return response
+
+    else:
+        return Response(
+            "Unsupported file type. Use 'csv', 'xlsx', or 'json'.",
+            status=400
+        )
 
 
 if __name__ == "__main__":

@@ -40,10 +40,10 @@ export const handleCleanse = () => {
 
   cancelButton.addEventListener('click', () => hide(pageOverlay));
 
-  imputeSelectContainer.appendChild(createDropdown(getTableColumns(mainTable), 'impute-column'));
-  defaultSelectContainer.appendChild(createDropdown(getTableColumns(mainTable), 'default'));
-  dateSelectContainer.appendChild(createDropdown(getTableColumns(mainTable), 'date'));
-  outlierSelectContainer.appendChild(createDropdown(getTableColumns(mainTable), 'outliers'));
+  imputeSelectContainer.appendChild(createDropdown(getTableColumns(), 'impute-column'));
+  defaultSelectContainer.appendChild(createDropdown(getTableColumns(), 'default'));
+  dateSelectContainer.appendChild(createDropdown(getTableColumns(), 'date'));
+  outlierSelectContainer.appendChild(createDropdown(getTableColumns(), 'outliers'));
 
   checkboxes.forEach((checkbox) => {
     checkbox.addEventListener('change', () => {
@@ -69,7 +69,7 @@ export const handleCleanse = () => {
 
   previewButton.addEventListener('click', async () => {
     const options = getCleanseOptions();
-    const tableData = getTableData(mainTable);
+    const tableData = getTableData();
     const { cleanedData, rowsAffected } = await fetchCleanedData(tableData, options);
     updateTableUI(
       { data: cleanedData, rowsAffected },
@@ -82,7 +82,7 @@ export const handleCleanse = () => {
 
   applyButton.addEventListener('click', async () => {
     const options = getCleanseOptions();
-    const tableData = getTableData(mainTable);
+    const tableData = getTableData();
     const { cleanedData, rowsAffected } = await fetchCleanedData(tableData, options);
     updateTableUI({ data: cleanedData, rowsAffected }, mainTable, mainTotalRows, affectedRows);
     hide(pageOverlay);

@@ -1,6 +1,6 @@
 import { createDropdown } from './dropdown.js';
-import { getTableColumns, getTableData } from './holy-table.js';
 import { show, hide, updateTableUI } from './utils.js';
+import { getTableColumns, getTableData } from './holy-table.js';
 import { showSnackbar } from './snackbar.js';
 import {
   initPreview,
@@ -22,7 +22,6 @@ export const handleDeduplicate = () => {
   const dropdownSubset = dropdownGroup.querySelector('.dropdown-subset');
   const radioGroup = dropdownGroup.querySelector('.radio-group');
   const selectContainer = dropdownGroup.querySelector('.select-container');
-  const table = document.querySelector('.table-main');
   const previewButton = document.querySelector('.btn[data-action="preview"]');
 
   const applyButton = document.querySelector('.btn[data-action="apply"]');
@@ -36,13 +35,13 @@ export const handleDeduplicate = () => {
       dropdownSubset.classList.remove('selected');
     }
   });
+
   cancelButton.addEventListener('click', () => hide(pageOverlay));
-  selectContainer.appendChild(createDropdown(getTableColumns(table), 'column'));
+
+  selectContainer.appendChild(createDropdown(getTableColumns(), 'column'));
 
   previewButton.addEventListener('click', async () => {
-    const options = getDeduplicateOptions();
-    const tableData = getTableData(table);
-    const { deduplicatedData, rowsRemoved } = await fetchDeduplicatedData(tableData, options);
+    const { deduplicatedData, rowsRemoved } = await fetchDeduplicatedData();
     updateTableUI(
       { data: deduplicatedData, rowsAffected: rowsRemoved },
       previewTableContainer,
@@ -53,9 +52,7 @@ export const handleDeduplicate = () => {
   });
 
   applyButton.addEventListener('click', async () => {
-    const options = getDeduplicateOptions();
-    const tableData = getTableData(table);
-    const { deduplicatedData, rowsRemoved } = await fetchDeduplicatedData(tableData, options);
+    const { deduplicatedData, rowsRemoved } = await fetchDeduplicatedData();
     updateTableUI(
       { data: deduplicatedData, rowsAffected: rowsRemoved },
       mainTable,
@@ -67,11 +64,17 @@ export const handleDeduplicate = () => {
   });
 };
 
-export async function fetchDeduplicatedData(tableData, options) {
+export async function fetchDeduplicatedData() {
+  const options = getDeduplicateOptions();
+  const tableData = getTableData();
+
+  const formData = new FormData();
+  formData.append('tableData', JSON.stringify(tableData));
+  formData.append('options', JSON.stringify(options));
+
   const response = await fetch('http://localhost:5000/deduplicate', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ tableData, options }),
+    body: formData,
   });
 
   const data = await response.json();

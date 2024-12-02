@@ -2,7 +2,6 @@ import { show, hide, updateTableDataType } from './utils.js';
 import { showSnackbar } from './snackbar.js';
 
 const pageOverlay = document.querySelector('.page-overlay');
-const mainTotalRows = document.querySelector('.total-rows');
 const mainTable = document.querySelector('.table-main');
 
 export const handleRevise = () => {
@@ -15,7 +14,7 @@ export const handleRevise = () => {
     const selectElement = reviseSelectContainer.querySelector('select[name="revise"]');
     const type = selectElement.value;
     const columnName = selectElement.dataset.column;
-    const tableData = getTableData(mainTable);
+    const tableData = getTableData();
     const { reformattedData, columnAffected, newType } = await fetchRevisedData(
       tableData,
       columnName,

@@ -1,19 +1,16 @@
-export function createTable(data) {
-  const headers = Object.keys(data[0]);
-  let headerHtml = '';
-  headers.forEach((header) => {
-    headerHtml += `<th data-action="format-revise" data-type="string">${header}</th>`;
-  });
-
-  let rowHtml = '';
-  data.forEach((row) => {
-    rowHtml += '<tr>';
-    Object.values(row).forEach((cell) => {
-      rowHtml += `<td>${cell}</td>`;
-    });
-    rowHtml += '</tr>';
-  });
-
+export function createTable(tableData) {
+  const headers = Object.keys(tableData[0]);
+  const headerHtml = headers
+    .map((header) => `<th data-action="format-revise" data-type="string">${header}</th>`)
+    .join('');
+  const rowHtml = tableData
+    .map(
+      (row) =>
+        `<tr>${Object.values(row)
+          .map((cell) => `<td>${cell}</td>`)
+          .join('')}</tr>`,
+    )
+    .join('');
   const tableHtml = `
     <div class="table-container">
         <table>
@@ -27,15 +24,19 @@ export function createTable(data) {
             </tbody>
         </table>
     </div>`;
-
   return tableHtml;
 }
 
-export function getTableData(tableElement) {
-  const table = tableElement;
-  const rows = table.querySelectorAll('tr');
+export function getTableData() {
+  const mainTable = document.querySelector('.table-main');
+
+  if (!mainTable) return [];
+
+  const rows = mainTable.querySelectorAll('tr');
   const headers = [];
   const data = [];
+
+  if (rows.length === 0) return [];
 
   const headerCells = rows[0].querySelectorAll('th');
   headerCells.forEach((cell) => {
@@ -57,14 +58,14 @@ export function getTableData(tableElement) {
 }
 
 export function getTableLength(tableElement) {
-  const table = tableElement;
-  const rows = table.querySelectorAll('tr');
+  const mainTable = document.querySelector('.table-main');
+  const rows = mainTable.querySelectorAll('tr');
   return rows.length - 1; // minus the headers
 }
 
 export function getTableColumns(tableElement) {
-  const table = tableElement;
-  const headers = table.querySelectorAll('th');
+  const mainTable = document.querySelector('.table-main');
+  const headers = mainTable.querySelectorAll('th');
   const columns = Array.from(headers).map((header) => header.textContent.trim());
   return columns;
 }

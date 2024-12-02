@@ -7,7 +7,7 @@ include '../components/components.php';
 ?>
 
 <h2>Merge</h2>
-<div class="dropdown-group file">
+<div class="dropdown-group filemerge">
     <div class="flow">
         <span class="legend">Upload another dataset</span>
         <?php renderButton("Upload", "upload")?>

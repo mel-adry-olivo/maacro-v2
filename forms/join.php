@@ -20,19 +20,6 @@ include '../components/components.php';
         <p class="file-name"></p>
     </div>
     <div class="flex margin-top">
-        <!-- <div class="flow fill-space">
-            <span class="legend">Merge column by</span>
-            <div class="dropdown dropdown-merge selected" >
-                <div class="dropdown-wrapper no-margin">
-                    <div class="input-container">
-                        <div class="fill-space select-container" data-action="join">
-
-                        </div>
-                        <i data-lucide="chevron-down"></i>
-                    </div>
-                </div>
-            </div>
-        </div> -->
         <div class="flow fill-space">
             <span class="legend">Axis</span>
             <div class="dropdown dropdown-method selected" >

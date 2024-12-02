@@ -1,6 +1,5 @@
-import { show, hide, updateTableUI, updateTableDataType } from './utils.js';
-import { createDropdown } from './dropdown.js';
-import { getTableColumns, getTableData } from './holy-table.js';
+import { show, hide, updateTableUI } from './utils.js';
+import { getTableData } from './holy-table.js';
 import { showSnackbar } from './snackbar.js';
 import { initPreview, previewContainer, previewTableContainer } from './holy-preview.js';
 
@@ -14,9 +13,9 @@ export const handleJoin = () => {
   const previewButton = document.querySelector('.btn[data-action="preview"]');
   const applyButton = document.querySelector('.btn[data-action="apply"]');
   const cancelButton = document.querySelector('.btn[data-action="cancel"]');
-  const uploadButton = document.querySelector('.btn[data-action="upload"]');
-  const fileInput = document.querySelector('input[type="file"]');
   const uploadContainer = document.querySelector('.dropdown-group.file');
+  const uploadButton = uploadContainer.querySelector('.btn[data-action="upload"]');
+  const fileInput = uploadContainer.querySelector('input[type="file"]');
   const dropdownGroup = document.querySelector('.dropdown-group.join');
   const fileContainer = document.querySelector('.file.hidden');
   const fileName = document.querySelector('.file-name');
@@ -26,13 +25,11 @@ export const handleJoin = () => {
   uploadButton.addEventListener('click', () => fileInput.click());
 
   fileInput.addEventListener('change', async (event) => {
-    const tableData = JSON.stringify(getTableData(mainTable));
     selectedFile = event.target.files[0];
     if (!selectedFile) return;
 
     const formData = new FormData();
     formData.append('file', selectedFile);
-    formData.append('tableData', tableData);
 
     const response = await fetch('http://localhost:5000/upload', {
       method: 'POST',
@@ -50,7 +47,12 @@ export const handleJoin = () => {
   });
 
   previewButton.addEventListener('click', async () => {
-    const tableData = JSON.stringify(getTableData(mainTable));
+    if (!selectedFile) {
+      showSnackbar('Join', 'Please upload a file first.', 3000);
+      return;
+    }
+
+    const tableData = JSON.stringify(getTableData());
     const selectedAxis = dropdownGroup.querySelector('select[data-action="axis"]').value;
 
     const formData = new FormData();
@@ -64,7 +66,11 @@ export const handleJoin = () => {
   });
 
   applyButton.addEventListener('click', async () => {
-    const tableData = JSON.stringify(getTableData(mainTable));
+    if (!selectedFile) {
+      showSnackbar('Join', 'Please upload a file first.', 3000);
+      return;
+    }
+    const tableData = JSON.stringify(getTableData());
     const selectedAxis = dropdownGroup.querySelector('select[data-action="axis"]').value;
 
     const formData = new FormData();

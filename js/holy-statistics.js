@@ -1,12 +1,9 @@
-import { show, hide, updateTableUI, updateTableDataType } from './utils.js';
-import { createDropdown } from './dropdown.js';
+import { show, hide, updateTableUI } from './utils.js';
 import { getTableColumns, getTableData } from './holy-table.js';
 import { showSnackbar } from './snackbar.js';
 import { initPreview, previewContainer, previewTableContainer } from './holy-preview.js';
 
 const pageOverlay = document.querySelector('.page-overlay');
-const mainTotalRows = document.querySelector('.total-rows');
-const mainTable = document.querySelector('.table-main');
 
 export const handleStatistics = () => {
   initPreview();
@@ -21,7 +18,7 @@ export const handleStatistics = () => {
   const viewButton = document.querySelector('.btn[data-action="view"]');
   const checkboxContainer = statisticsDropdown.querySelector('.checkbox-container');
 
-  createExploreColumns(getTableColumns(mainTable), 'main');
+  createExploreColumns(getTableColumns(), 'main');
 
   document.addEventListener('click', (event) => {
     if (event.target.classList.contains('column')) {
@@ -92,7 +89,7 @@ export const handleStatistics = () => {
 
   cancelButton.addEventListener('click', () => hide(pageOverlay));
   viewButton.addEventListener('click', async () => {
-    const tableData = getTableData(mainTable);
+    const tableData = getTableData();
     const options = getExploreOptions(variableColumnGroup, splitColumnGroup, checkboxContainer);
 
     const data = await fetchAggregatedData(tableData, options);

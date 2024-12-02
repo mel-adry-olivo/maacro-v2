@@ -3,8 +3,8 @@
 
 require './components/components.php';  
 
-$csv = json_decode(file_get_contents('./test2.json'), true);
-
+// $csv = json_decode(file_get_contents('./test2.json'), true);
+$csv = [];
 ?>
 
 <!DOCTYPE html>
@@ -39,8 +39,8 @@ $csv = json_decode(file_get_contents('./test2.json'), true);
             </div>
             <div class="toolbar-right">
                 <?php
-                renderFormButton("", "upload");
-                renderFormButton("", "download");
+                renderFormButton("Upload", "upload");
+                renderFormButton("Download", "download");
                 ?>
             </div>
         </div>
@@ -65,12 +65,7 @@ $csv = json_decode(file_get_contents('./test2.json'), true);
         </div>
         
     </div>
-    <div class="snackbar">
-        <div class="snackbar-header">
-            <i data-lucide="bell"></i>
-            <span class="snackbar-title"></span>
-        </div>
-        <span class="snackbar-text"></span>
+    <div class="snackbar-container">
     </div>
 </body>
 </html>

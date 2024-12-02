@@ -1,6 +1,6 @@
-import { show, hide, updateTableUI, updateTableDataType } from './utils.js';
+import { show, hide, updateTableUI } from './utils.js';
 import { createDropdown } from './dropdown.js';
-import { getTableColumns, getTableData } from './holy-table.js';
+import { getTableData } from './holy-table.js';
 import { showSnackbar } from './snackbar.js';
 import {
   initPreview,
@@ -20,9 +20,9 @@ export const handleMerge = () => {
   const previewButton = document.querySelector('.btn[data-action="preview"]');
   const applyButton = document.querySelector('.btn[data-action="apply"]');
   const cancelButton = document.querySelector('.btn[data-action="cancel"]');
-  const uploadButton = document.querySelector('.btn[data-action="upload"]');
-  const fileInput = document.querySelector('input[type="file"]');
-  const uploadContainer = document.querySelector('.dropdown-group.file');
+  const uploadContainer = document.querySelector('.dropdown-group.filemerge');
+  const uploadButton = uploadContainer.querySelector('.btn[data-action="upload"]');
+  const fileInput = uploadContainer.querySelector('input[type="file"]');
   const dropdownGroup = document.querySelector('.dropdown-group.merge');
   const mergeContainer = document.querySelector('.dropdown-merge');
   const methodContainer = document.querySelector('.dropdown-method');
@@ -35,7 +35,7 @@ export const handleMerge = () => {
   uploadButton.addEventListener('click', () => fileInput.click());
 
   fileInput.addEventListener('change', async (event) => {
-    const tableData = JSON.stringify(getTableData(mainTable));
+    const tableData = JSON.stringify(getTableData());
     selectedFile = event.target.files[0];
     if (!selectedFile) return;
 
@@ -60,10 +60,14 @@ export const handleMerge = () => {
   });
 
   previewButton.addEventListener('click', async () => {
+    if (!selectedFile) {
+      showSnackbar('Merge', 'Please upload a file first.', 3000);
+      return;
+    }
     const selectedOption = mergeContainer.querySelector('select[data-action="column"]').value;
     const mergeMethod = methodContainer.querySelector('select[data-action="merge-method"]').value;
 
-    const tableData = JSON.stringify(getTableData(mainTable));
+    const tableData = JSON.stringify(getTableData());
 
     const formData = new FormData();
     formData.append('file', selectedFile);
@@ -77,10 +81,14 @@ export const handleMerge = () => {
   });
 
   applyButton.addEventListener('click', async () => {
+    if (!selectedFile) {
+      showSnackbar('Merge', 'Please upload a file first.', 3000);
+      return;
+    }
     const selectedOption = mergeContainer.querySelector('select[data-action="column"]').value;
     const mergeMethod = methodContainer.querySelector('select[data-action="merge-method"]').value;
 
-    const tableData = JSON.stringify(getTableData(mainTable));
+    const tableData = JSON.stringify(getTableData());
 
     const formData = new FormData();
     formData.append('file', selectedFile);

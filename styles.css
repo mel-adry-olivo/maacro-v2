@@ -133,6 +133,7 @@ svg {
 
   & > * {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.25rem;
   }
 }
@@ -149,6 +150,7 @@ svg {
   user-select: none;
   white-space: nowrap;
   cursor: pointer;
+  max-height: fit-content;
 }
 
 .btn.btn-filled {
@@ -419,15 +421,22 @@ select {
   opacity: 0.8;
 }
 
-.snackbar {
+.snackbar-container {
   position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.5rem;
+  z-index: 9999;
+}
+
+.snackbar {
   display: inline-flex;
   flex-direction: column;
   padding: 1rem 1.25rem;
   gap: 0.5rem;
   border-radius: 1rem;
-  bottom: 2rem;
-  left: 2rem;
   background-color: var(--clr-text);
   color: var(--clr-skeleton);
   opacity: 0;
@@ -603,5 +612,20 @@ select {
     &:checked::after {
       background-color: var(--clr-text-secondary);
     }
+  }
+}
+
+.no-data {
+  padding: 1rem 1.25rem;
+}
+
+@media (max-width: 1000px) {
+  .toolbar-left {
+    max-width: 400px;
+  }
+
+  .toolbar-right {
+    justify-content: flex-end;
+    align-items: flex-end;
   }
 }

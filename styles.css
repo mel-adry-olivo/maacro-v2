@@ -119,11 +119,15 @@ svg {
 
 .title {
   color: var(--clr-text-secondary);
-  line-height: 2;
 
   & > span {
     color: var(--clr-text);
   }
+}
+
+.subtitle {
+  color: var(--clr-text-secondary);
+  font-weight: 400;
 }
 
 .toolbar {

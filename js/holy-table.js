@@ -12,31 +12,27 @@ export function createTable(tableData) {
     )
     .join('');
   const tableHtml = `
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    ${headerHtml}
-                </tr>
-            </thead>
-            <tbody>
-                ${rowHtml}
-            </tbody>
-        </table>
-    </div>`;
+      <table>
+          <thead>
+              <tr>
+                  ${headerHtml}
+              </tr>
+          </thead>
+          <tbody>
+              ${rowHtml}
+          </tbody>
+      </table>`;
   return tableHtml;
 }
 
 export function getTableData() {
   const mainTable = document.querySelector('.table-main');
-
-  if (!mainTable) return [];
-
   const rows = mainTable.querySelectorAll('tr');
-  const headers = [];
-  const data = [];
 
   if (rows.length === 0) return [];
+
+  const headers = [];
+  const data = [];
 
   const headerCells = rows[0].querySelectorAll('th');
   headerCells.forEach((cell) => {

@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify, Response, after_this_request
 from flask_cors import CORS
 import pandas as pd
 import re
@@ -174,6 +174,15 @@ def upload_file():
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)  # Ensure the upload folder exists
     file.save(file_path)
+
+    @after_this_request
+    def remove_file(response):
+        try:
+            if os.path.exists(file_path):
+                os.remove(file_path)
+        except Exception as e:
+            app.logger.error(f"Error deleting file: {file_path}, Error: {str(e)}")
+        return response
 
     table_data = request.form.get('tableData')
     table_df = None

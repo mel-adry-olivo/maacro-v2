@@ -1,0 +1,67 @@
+Date : 2024-12-05 02:17:42
+Directory : c:\xampp\htdocs\maacro-v2
+Total : 34 files,  2868 codes, 13 comments, 578 blanks, all 3459 lines
+
+Languages
++------------------+------------+------------+------------+------------+------------+
+| language         | files      | code       | comment    | blank      | total      |
++------------------+------------+------------+------------+------------+------------+
+| JavaScript       |         17 |      1,165 |          0 |        245 |      1,410 |
+| PHP              |         13 |        662 |          1 |         92 |        755 |
+| CSS              |          2 |        571 |          7 |        111 |        689 |
+| Python           |          1 |        455 |          5 |        130 |        590 |
+| pip requirements |          1 |         15 |          0 |          0 |         15 |
++------------------+------------+------------+------------+------------+------------+
+
+Directories
++-----------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                | files      | code       | comment    | blank      | total      |
++-----------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                   |         34 |      2,868 |         13 |        578 |      3,459 |
+| . (Files)                                           |          4 |        700 |          8 |        124 |        832 |
+| api                                                 |          2 |        470 |          5 |        130 |        605 |
+| components                                          |          1 |        116 |          0 |         20 |        136 |
+| forms                                               |         11 |        480 |          0 |         66 |        546 |
+| js                                                  |         16 |      1,102 |          0 |        238 |      1,340 |
++-----------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-----------------------------------------------------+------------------+------------+------------+------------+------------+
+| filename                                            | language         | code       | comment    | blank      | total      |
++-----------------------------------------------------+------------------+------------+------------+------------+------------+
+| c:\xampp\htdocs\maacro-v2\api\app.py                | Python           |        455 |          5 |        130 |        590 |
+| c:\xampp\htdocs\maacro-v2\api\requirements.txt      | pip requirements |         15 |          0 |          0 |         15 |
+| c:\xampp\htdocs\maacro-v2\components\components.php | PHP              |        116 |          0 |         20 |        136 |
+| c:\xampp\htdocs\maacro-v2\forms\aggregate.php       | PHP              |          3 |          0 |          0 |          3 |
+| c:\xampp\htdocs\maacro-v2\forms\cleanse.php         | PHP              |         85 |          0 |          9 |         94 |
+| c:\xampp\htdocs\maacro-v2\forms\deduplicate.php     | PHP              |         31 |          0 |          5 |         36 |
+| c:\xampp\htdocs\maacro-v2\forms\derive.php          | PHP              |         37 |          0 |          4 |         41 |
+| c:\xampp\htdocs\maacro-v2\forms\download.php        | PHP              |         16 |          0 |          5 |         21 |
+| c:\xampp\htdocs\maacro-v2\forms\format-revise.php   | PHP              |         37 |          0 |          6 |         43 |
+| c:\xampp\htdocs\maacro-v2\forms\join.php            | PHP              |         40 |          0 |          6 |         46 |
+| c:\xampp\htdocs\maacro-v2\forms\merge.php           | PHP              |         54 |          0 |          7 |         61 |
+| c:\xampp\htdocs\maacro-v2\forms\statistics.php      | PHP              |         86 |          0 |         10 |         96 |
+| c:\xampp\htdocs\maacro-v2\forms\upload.php          | PHP              |         21 |          0 |          5 |         26 |
+| c:\xampp\htdocs\maacro-v2\forms\visualize.php       | PHP              |         70 |          0 |          9 |         79 |
+| c:\xampp\htdocs\maacro-v2\index.php                 | PHP              |         66 |          1 |          6 |         73 |
+| c:\xampp\htdocs\maacro-v2\js\dropdown.js            | JavaScript       |         13 |          0 |          3 |         16 |
+| c:\xampp\htdocs\maacro-v2\js\holy-cleanse.js        | JavaScript       |        137 |          0 |         21 |        158 |
+| c:\xampp\htdocs\maacro-v2\js\holy-deduplicate.js    | JavaScript       |         76 |          0 |         18 |         94 |
+| c:\xampp\htdocs\maacro-v2\js\holy-derive.js         | JavaScript       |         73 |          0 |         15 |         88 |
+| c:\xampp\htdocs\maacro-v2\js\holy-download.js       | JavaScript       |         34 |          0 |         10 |         44 |
+| c:\xampp\htdocs\maacro-v2\js\holy-join.js           | JavaScript       |         79 |          0 |         20 |         99 |
+| c:\xampp\htdocs\maacro-v2\js\holy-merge.js          | JavaScript       |        103 |          0 |         24 |        127 |
+| c:\xampp\htdocs\maacro-v2\js\holy-preview.js        | JavaScript       |         12 |          0 |          3 |         15 |
+| c:\xampp\htdocs\maacro-v2\js\holy-revise.js         | JavaScript       |         73 |          0 |         13 |         86 |
+| c:\xampp\htdocs\maacro-v2\js\holy-statistics.js     | JavaScript       |        128 |          0 |         26 |        154 |
+| c:\xampp\htdocs\maacro-v2\js\holy-table.js          | JavaScript       |         79 |          0 |         17 |         96 |
+| c:\xampp\htdocs\maacro-v2\js\holy-upload.js         | JavaScript       |         62 |          0 |         15 |         77 |
+| c:\xampp\htdocs\maacro-v2\js\holy-visualize.js      | JavaScript       |        140 |          0 |         28 |        168 |
+| c:\xampp\htdocs\maacro-v2\js\snackbar.js            | JavaScript       |         29 |          0 |         10 |         39 |
+| c:\xampp\htdocs\maacro-v2\js\state.js               | JavaScript       |         12 |          0 |          5 |         17 |
+| c:\xampp\htdocs\maacro-v2\js\utils.js               | JavaScript       |         52 |          0 |         10 |         62 |
+| c:\xampp\htdocs\maacro-v2\script.js                 | JavaScript       |         63 |          0 |          7 |         70 |
+| c:\xampp\htdocs\maacro-v2\styles.css                | CSS              |        529 |          7 |        100 |        636 |
+| c:\xampp\htdocs\maacro-v2\utils.css                 | CSS              |         42 |          0 |         11 |         53 |
+| Total                                               |                  |      2,868 |         13 |        578 |      3,459 |
++-----------------------------------------------------+------------------+------------+------------+------------+------------+

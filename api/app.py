@@ -1,15 +1,16 @@
 from flask import Flask, request, jsonify, Response, after_this_request
 from flask_cors import CORS
 import pandas as pd
-import re
-import os
-from io import StringIO
 import json
+import os
+import io
+import base64
+
 import matplotlib.pyplot as plt
 import seaborn as sns
-import io
-from io import BytesIO
-import base64
+import matplotlib
+matplotlib.use('Agg')
+
 
 app = Flask(__name__)
 app.json.sort_keys = False
@@ -26,6 +27,7 @@ def index():
 
 @app.route("/duplicates", methods=["POST"])
 def get_duplicates():
+    
     tableData = request.get_json()
 
     df = pd.DataFrame(tableData)
@@ -79,7 +81,8 @@ def cleanse():
     df = df.convert_dtypes()
 
     for column in df.columns:
-        df[column] = pd.to_numeric(df[column], errors='coerce')
+        if not df[column].dtype.name in ['object', 'string'] or df[column].str.isnumeric().all():
+            df[column] = pd.to_numeric(df[column], errors='coerce')
 
     options = data.get('options')
     optionsDict = json.loads(options)
@@ -135,10 +138,10 @@ def cleanse():
     })
 
 def handleMissingData(df, options):
-    df = df.replace('', pd.NA)  # Replace empty strings with pd.NA
+    df = df.replace('', pd.NA) 
     methods = {
         'drop-rows': lambda df: df.dropna(),
-        'default-value': lambda df: df.fillna(options['methodValue']),
+        'default-value': lambda df, column, value: df.fillna({column: value}),
         'impute': {
             'mean': lambda df: df.fillna(df.mean()),
             'median': lambda df: df.fillna(df.median()),
@@ -146,12 +149,16 @@ def handleMissingData(df, options):
         }
     }
     
-    # Ensure that columns involved in imputation are cast to float before imputation
     if options['method'] == 'impute':
         column = options['column']
         # Cast the column to a float64 type before imputation
         df[column] = df[column].astype('float64')
         return methods['impute'][options['methodValue']](df)
+    elif options['method'] == 'default-value':
+        column = options['column']
+        value = options['methodValue']  # Default value to fill
+        # Apply default value only to the chosen column
+        return methods['default-value'](df, column, value)
     else:
         return methods[options['method']](df)
 
@@ -198,7 +205,6 @@ def reformat():
         return jsonify({"error": f"Failed to convert column '{column}' to type '{target_type}': {str(e)}"}), 500
 
     reformatted_data = df.to_dict(orient='records')
-    print(reformatted_data)
 
     return jsonify({
         'reformattedData': reformatted_data,
@@ -229,9 +235,10 @@ def upload_file():
 
     table_data = request.form.get('tableData')
     table_df = None
+    
     if table_data:
         try:
-            table_df = pd.DataFrame.from_records(eval(table_data))  # Convert to DataFrame
+            table_df = pd.DataFrame.from_records(eval(table_data))  
         except Exception as e:
             return jsonify({'message': 'Invalid tableData format', 'error': str(e)}), 400
 
@@ -355,9 +362,15 @@ def explore_data():
     json_data = StringIO(table)
     table_df = pd.read_json(json_data)
 
+    
     table_df = table_df.convert_dtypes()
     options = data.get('options')
     optionsDict = json.loads(options)
+
+    table_df = table_df.replace('', pd.NA) 
+    # for col in table_df.columns:
+    #     table_df[col] = pd.to_numeric(table_df[col], errors='coerce')
+
 
     variables = optionsDict['variables']
     splits = optionsDict['splits']
@@ -423,6 +436,8 @@ def visualize_data():
 
     df = pd.read_json(json_data)
     df = df.convert_dtypes()
+
+    # df = df.apply(pd.to_numeric, errors='coerce')
     
     try:
         plot_images = {}

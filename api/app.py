@@ -361,18 +361,24 @@ def visualize_data():
                         sns.barplot(x=plot_data.index, y=plot_data.values)
                     else:
                         sns.barplot(data=df, x=splits[0], y=variable)
+
                 elif plot_type == 'box':
                     sns.boxplot(data=df, x=splits[0] if splits else variable, y=variable if splits else None)
+
                 elif plot_type == 'violin':
                     sns.violinplot(data=df, x=splits[0] if splits else variable, y=variable if splits else None, split=True)
+
                 elif plot_type == 'scatter':
                     if len(variables) < 2:
                         return jsonify({'error': 'Scatter plots require at least two variables'}), 400
                     sns.scatterplot(data=df, x=variables[0], y=variables[1], hue=splits[0] if splits else None)
+
                 elif plot_type == 'density':
                     sns.kdeplot(data=df, x=variable, hue=splits[0] if splits else None, fill=True)
+
                 elif plot_type == 'histogram':
-                    sns.histplot(data=df, x=variable, hue=splits[0] if splits else None, kde=False)
+
+                    sns.histplot(data=df, x=variable, hue=splits[0] if splits else None)
                 else:
                     return jsonify({'error': f'Invalid plot type: {plot_type}'}), 400
 

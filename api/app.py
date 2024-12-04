@@ -1,13 +1,14 @@
 from flask import Flask, request, jsonify, Response, after_this_request
 from flask_cors import CORS
 import pandas as pd
-import json
 import os
-import io
-import base64
-
-import matplotlib.pyplot as plt
+from io import StringIO
+import json
 import seaborn as sns
+import base64
+import io
+from io import BytesIO
+import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('Agg')
 
@@ -21,44 +22,20 @@ UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-@app.route("/")
-def index():
-    return jsonify({"message": "Hello, World!"})
-
-@app.route("/duplicates", methods=["POST"])
-def get_duplicates():
-    
-    tableData = request.get_json()
-
-    df = pd.DataFrame(tableData)
-    duplicates = df[df.duplicated(keep=False)]
-    response = duplicates.to_json(orient="records")
-    return response
-
-
 @app.route("/deduplicate", methods=["POST"])
 def deduplicate():
 
     data = request.form
-    table_data = data.get('tableData')
-    json_data = StringIO(table_data)
+    tableJson = data.get('tableData')
+    tableDf = pd.read_json(tableJson).convert_dtypes()
+    optionsDictionary = json.loads(data.get('options'))
+    print(optionsDictionary)
 
-    df = pd.read_json(json_data)
-    df = df.convert_dtypes()
+    subset = None if optionsDictionary[0] == 'all-columns' else optionsDictionary[0]
+    keep = optionsDictionary[1] if len(optionsDictionary) > 1 else 'first'
+    deduplicated_df = tableDf.drop_duplicates(subset=subset, keep=keep)
 
-    options = data.get('options')
-
-    optionsDict = json.loads(options)
-
-    if(optionsDict[0] == 'all-columns'):
-        optionsDict[0] = None
-    
-    if optionsDict:
-        deduplicated_df = df.drop_duplicates(subset=optionsDict[0], keep=optionsDict[1])
-    else:
-        deduplicated_df = df.drop_duplicates()  
-    
-    rows_removed = len(df) - len(deduplicated_df)
+    rows_removed = len(tableDf) - len(deduplicated_df)
     deduplicated_data = deduplicated_df.to_dict(orient="records")
 
     response = jsonify({
@@ -74,26 +51,20 @@ def cleanse():
 
     data = request.form
     table = data.get('tableData')
- 
-    json_data = StringIO(table)
-    df = pd.read_json(json_data)
-    df = df.replace('', pd.NA)
-    df = df.convert_dtypes()
+    df = pd.read_json(table).replace('', pd.NA).convert_dtypes()
 
     for column in df.columns:
         if not df[column].dtype.name in ['object', 'string'] or df[column].str.isnumeric().all():
             df[column] = pd.to_numeric(df[column], errors='coerce')
 
-    options = data.get('options')
-    optionsDict = json.loads(options)
-
+    optionsDict = json.loads(data.get('options'))
     missing_options = optionsDict['missingOptions']
+    tools_options = optionsDict['toolsOptions']
     original_rows = len(df)
 
     if(missing_options['method'] != ''):
         df = handleMissingData(df, missing_options)
 
-    tools_options = optionsDict['toolsOptions']
     if 'formatDate' in tools_options:
         column = tools_options['formatDate']['column']
         try:
@@ -151,13 +122,11 @@ def handleMissingData(df, options):
     
     if options['method'] == 'impute':
         column = options['column']
-        # Cast the column to a float64 type before imputation
         df[column] = df[column].astype('float64')
         return methods['impute'][options['methodValue']](df)
     elif options['method'] == 'default-value':
         column = options['column']
-        value = options['methodValue']  # Default value to fill
-        # Apply default value only to the chosen column
+        value = options['methodValue']  
         return methods['default-value'](df, column, value)
     else:
         return methods[options['method']](df)

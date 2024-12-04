@@ -1,5 +1,6 @@
 import { show, hide, updateTableDataType } from './utils.js';
 import { showSnackbar } from './snackbar.js';
+import { getTableData } from './holy-table.js';
 
 const pageOverlay = document.querySelector('.page-overlay');
 const mainTable = document.querySelector('.table-main');

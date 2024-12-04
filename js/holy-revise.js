@@ -1,5 +1,7 @@
 import { show, hide, updateTableDataType } from './utils.js';
 import { showSnackbar } from './snackbar.js';
+import { getTableData, setTableColumns } from './holy-table.js';
+import { getColumnsState, setColumnsState } from './state.js';
 
 const pageOverlay = document.querySelector('.page-overlay');
 const mainTable = document.querySelector('.table-main');
@@ -37,6 +39,7 @@ export const handleRevise = () => {
     const currentState = getColumnsState();
     currentState[columnAffected] = newType;
     setColumnsState(currentState);
+    setTableColumns(getColumnsState());
 
     hide(pageOverlay);
     showSnackbar('Format Revision', 'Data type updated successfully.', 3000);

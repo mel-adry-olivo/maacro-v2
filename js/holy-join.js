@@ -52,6 +52,8 @@ export const handleJoin = () => {
       return;
     }
 
+    console.log(JSON.stringify(getTableData()));
+
     const tableData = JSON.stringify(getTableData());
     const selectedAxis = dropdownGroup.querySelector('select[data-action="axis"]').value;
 

@@ -68,9 +68,7 @@ export const handleCleanse = () => {
   });
 
   previewButton.addEventListener('click', async () => {
-    const options = getCleanseOptions();
-    const tableData = getTableData();
-    const { cleanedData, rowsAffected } = await fetchCleanedData(tableData, options);
+    const { cleanedData, rowsAffected } = await fetchCleanedData();
     updateTableUI(
       { data: cleanedData, rowsAffected },
       previewTableContainer,
@@ -81,20 +79,24 @@ export const handleCleanse = () => {
   });
 
   applyButton.addEventListener('click', async () => {
-    const options = getCleanseOptions();
-    const tableData = getTableData();
-    const { cleanedData, rowsAffected } = await fetchCleanedData(tableData, options);
+    const { cleanedData, rowsAffected } = await fetchCleanedData();
     updateTableUI({ data: cleanedData, rowsAffected }, mainTable, mainTotalRows, affectedRows);
     hide(pageOverlay);
     showSnackbar('Data cleaned', `${rowsAffected} rows affected`, 3000);
   });
 };
 
-export const fetchCleanedData = async (tableData, options) => {
+export const fetchCleanedData = async () => {
+  const options = getCleanseOptions();
+  const tableData = getTableData();
+
+  const formData = new FormData();
+  formData.append('tableData', JSON.stringify(tableData));
+  formData.append('options', JSON.stringify(options));
+
   const response = await fetch('http://localhost:5000/cleanse', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ tableData, options }),
+    body: formData,
   });
 
   const data = await response.json();

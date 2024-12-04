@@ -45,6 +45,7 @@ def deduplicate():
     df = df.convert_dtypes()
 
     options = data.get('options')
+
     optionsDict = json.loads(options)
 
     if(optionsDict[0] == 'all-columns'):
@@ -68,19 +69,28 @@ def deduplicate():
 
 @app.route('/cleanse', methods=['POST'])
 def cleanse():
-    data = request.get_json()
-    table_data = data['tableData']
-    options = data['options']
 
-    df = pd.DataFrame(table_data)
+    data = request.form
+    table = data.get('tableData')
+ 
+    json_data = StringIO(table)
+    df = pd.read_json(json_data)
+    df = df.replace('', pd.NA)
+    df = df.convert_dtypes()
 
-    missing_options = options['missingOptions']
+    for column in df.columns:
+        df[column] = pd.to_numeric(df[column], errors='coerce')
+
+    options = data.get('options')
+    optionsDict = json.loads(options)
+
+    missing_options = optionsDict['missingOptions']
     original_rows = len(df)
 
     if(missing_options['method'] != ''):
         df = handleMissingData(df, missing_options)
 
-    tools_options = options['toolsOptions']
+    tools_options = optionsDict['toolsOptions']
     if 'formatDate' in tools_options:
         column = tools_options['formatDate']['column']
         try:
@@ -125,7 +135,7 @@ def cleanse():
     })
 
 def handleMissingData(df, options):
-    df = df.replace('', pd.NA)  
+    df = df.replace('', pd.NA)  # Replace empty strings with pd.NA
     methods = {
         'drop-rows': lambda df: df.dropna(),
         'default-value': lambda df: df.fillna(options['methodValue']),
@@ -135,7 +145,12 @@ def handleMissingData(df, options):
             'mode': lambda df: df.fillna(df.mode().iloc[0])
         }
     }
+    
+    # Ensure that columns involved in imputation are cast to float before imputation
     if options['method'] == 'impute':
+        column = options['column']
+        # Cast the column to a float64 type before imputation
+        df[column] = df[column].astype('float64')
         return methods['impute'][options['methodValue']](df)
     else:
         return methods[options['method']](df)
@@ -171,6 +186,7 @@ def upload_file():
     if not file or file.filename == '':
         return jsonify({'message': 'No selected file'}), 400
 
+
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)  # Ensure the upload folder exists
     file.save(file_path)
@@ -202,6 +218,8 @@ def upload_file():
     except Exception as e:
         return jsonify({'message': 'Error reading file', 'error': str(e)}), 500
 
+    df.fillna('', inplace=True)
+
     matching_columns = []
     if table_df is not None:
         matching_columns = list(set(df.columns).intersection(set(table_df.columns)))
@@ -209,6 +227,7 @@ def upload_file():
     total_rows = len(df)
 
     data_json = df.to_dict(orient='records')
+
     return jsonify({
         'data': data_json,
         'filename': file.filename,

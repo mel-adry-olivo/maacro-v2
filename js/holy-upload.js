@@ -38,6 +38,7 @@ export const handleUpload = () => {
     });
 
     const { data, filename } = await response.json();
+
     updateTableUI({ data: data }, previewTableContainer);
     show(previewContainer);
 

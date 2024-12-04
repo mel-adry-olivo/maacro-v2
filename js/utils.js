@@ -55,27 +55,6 @@ export function updateTableDataType({ data, columnName, newType }, tableContaine
 
   const tableHeaders = tableContainer.querySelectorAll('th');
 
-  let columnIndex = -1;
-  tableHeaders.forEach((th, index) => {
-    if (th.textContent === columnName) {
-      th.dataset.type = newType;
-      columnIndex = index;
-    }
-  });
-
-  if (newType === 'float') {
-    const tableRows = tableContainer.querySelectorAll('tbody tr');
-
-    tableRows.forEach((row) => {
-      const cells = row.querySelectorAll('td');
-      const cell = cells[columnIndex];
-      if (cell) {
-        const parsedValue = parseFloat(cell.textContent);
-        cell.textContent = parsedValue.toFixed(1);
-      }
-    });
-  }
-
   if (tableContainer.classList.contains('table-main')) {
     initHeaders();
   }

@@ -1,6 +1,6 @@
 import { show, hide, updateTableUI } from './utils.js';
 import { createDropdown } from './dropdown.js';
-import { getTableColumns, getTableData } from './holy-table.js';
+import { getTableColumnNames, getTableData } from './holy-table.js';
 import { showSnackbar } from './snackbar.js';
 import {
   initPreview,
@@ -26,8 +26,8 @@ export const handleDerive = () => {
 
   cancelButton.addEventListener('click', () => hide(pageOverlay));
 
-  column1SelectContainer.appendChild(createDropdown(getTableColumns(), 'column1'));
-  column2SelectContainer.appendChild(createDropdown(getTableColumns(), 'column2'));
+  column1SelectContainer.appendChild(createDropdown(getTableColumnNames(), 'column1'));
+  column2SelectContainer.appendChild(createDropdown(getTableColumnNames(), 'column2'));
 
   previewButton.addEventListener('click', async () => {
     const data = await fetchDerivedData();

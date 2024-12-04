@@ -1,5 +1,7 @@
 import { show, hide, updateTableDataType } from './utils.js';
 import { showSnackbar } from './snackbar.js';
+import { getTableData } from './holy-table.js';
+import { getColumnsState, setColumnsState } from './state.js';
 
 const pageOverlay = document.querySelector('.page-overlay');
 const mainTable = document.querySelector('.table-main');
@@ -8,6 +10,14 @@ export const handleRevise = () => {
   const applyButton = document.querySelector('.btn[data-action="apply"]');
   const cancelButton = document.querySelector('.btn[data-action="cancel"]');
   const reviseSelectContainer = document.querySelector('.select-container[data-action="revise"]');
+  const reviseDropdown = reviseSelectContainer.querySelector('select[name="revise"]');
+
+  reviseDropdown.addEventListener('change', () => {
+    const selectedOption = reviseDropdown.options[reviseDropdown.selectedIndex].value;
+    if (selectedOption === 'date') {
+      showSnackbar('Format Revision', 'Make sure to select a proper date column.', 3000);
+    }
+  });
 
   cancelButton.addEventListener('click', () => hide(pageOverlay));
   applyButton.addEventListener('click', async () => {
@@ -26,9 +36,12 @@ export const handleRevise = () => {
       mainTable,
     );
 
+    const currentState = getColumnsState();
+    currentState[columnAffected] = newType;
+    setColumnsState(currentState);
+
     hide(pageOverlay);
     showSnackbar('Format Revision', 'Data type updated successfully.', 3000);
-    initHeaders();
   });
 };
 
@@ -64,9 +77,7 @@ export async function editColumn(th, dataType) {
   const response = await fetch(
     './forms/format-revise.php?column=' + columnName + '&default=' + dataType,
   );
-
   const data = await response.text();
-
   document.querySelector('.form-container').innerHTML = data;
   handleRevise();
   lucide.createIcons();

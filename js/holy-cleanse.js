@@ -1,6 +1,6 @@
 import { show, hide, updateTableUI } from './utils.js';
 import { createDropdown } from './dropdown.js';
-import { getTableColumns, getTableData } from './holy-table.js';
+import { getTableColumnNames, getTableData } from './holy-table.js';
 import { showSnackbar } from './snackbar.js';
 import {
   initPreview,
@@ -40,10 +40,10 @@ export const handleCleanse = () => {
 
   cancelButton.addEventListener('click', () => hide(pageOverlay));
 
-  imputeSelectContainer.appendChild(createDropdown(getTableColumns(), 'impute-column'));
-  defaultSelectContainer.appendChild(createDropdown(getTableColumns(), 'default'));
-  dateSelectContainer.appendChild(createDropdown(getTableColumns(), 'date'));
-  outlierSelectContainer.appendChild(createDropdown(getTableColumns(), 'outliers'));
+  imputeSelectContainer.appendChild(createDropdown(getTableColumnNames(), 'impute-column'));
+  defaultSelectContainer.appendChild(createDropdown(getTableColumnNames(), 'default'));
+  dateSelectContainer.appendChild(createDropdown(getTableColumnNames(), 'date'));
+  outlierSelectContainer.appendChild(createDropdown(getTableColumnNames(), 'outliers'));
 
   checkboxes.forEach((checkbox) => {
     checkbox.addEventListener('change', () => {
@@ -105,6 +105,7 @@ export const fetchCleanedData = async () => {
 
 export const getCleanseOptions = () => {
   let method = document.querySelector('input[type="radio"][name="missing"]:checked');
+
   if (!method) {
     method = '';
   } else {
@@ -144,7 +145,7 @@ export const getCleanseOptions = () => {
     const column = document.querySelector('select[data-action="default"]').value;
     const dataValue = document.querySelector('input[type="text"][name="default"]').value;
     missingOptions.column = column;
-    missingOptions.methodValue = dataValue;
+    missingOptions.methodValue = isNaN(dataValue) ? dataValue : parseInt(dataValue);
   } else if (method === 'impute') {
     const column = document.querySelector('select[data-action="impute-column"]').value;
     const dataValue = document.querySelector('select[name="impute"]').value;

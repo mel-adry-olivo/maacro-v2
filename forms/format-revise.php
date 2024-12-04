@@ -23,8 +23,8 @@ $default = $_GET['default'];
                     float
                 </option>
                 <option 
-                    value="str" <?php echo ($default === 'string') ? 'selected' : ''; ?>>
-                    string
+                    value="str" <?php echo ($default === 'str') ? 'selected' : ''; ?>>
+                    str
                 </option>
                 <option 
                     value="date" <?php echo ($default === 'date') ? 'selected' : ''; ?>>

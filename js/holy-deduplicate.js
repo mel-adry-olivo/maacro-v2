@@ -1,6 +1,6 @@
 import { createDropdown } from './dropdown.js';
 import { show, hide, updateTableUI } from './utils.js';
-import { getTableColumns, getTableData } from './holy-table.js';
+import { getTableColumnNames, getTableData } from './holy-table.js';
 import { showSnackbar } from './snackbar.js';
 import {
   initPreview,
@@ -38,7 +38,7 @@ export const handleDeduplicate = () => {
 
   cancelButton.addEventListener('click', () => hide(pageOverlay));
 
-  selectContainer.appendChild(createDropdown(getTableColumns(), 'column'));
+  selectContainer.appendChild(createDropdown(getTableColumnNames(), 'column'));
 
   previewButton.addEventListener('click', async () => {
     const { deduplicatedData, rowsRemoved } = await fetchDeduplicatedData();

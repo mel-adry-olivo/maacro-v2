@@ -18,7 +18,8 @@ $csv = [];
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="utils.css">
-    <script src="script.js" type="module" defer></script>
+    <script src="./js/state.js" type="module" defer></script>
+    <script src="./script.js" type="module" defer></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </head>
@@ -64,7 +65,6 @@ $csv = [];
         </div>
         <div class="form-container">
         </div>
-        
     </div>
     <div class="snackbar-container">
     </div>

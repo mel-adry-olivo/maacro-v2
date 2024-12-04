@@ -1,6 +1,6 @@
 import { show, hide } from './utils.js';
 import { createDropdown } from './dropdown.js';
-import { getTableColumns, getTableData } from './holy-table.js';
+import { getTableColumnNames, getTableData } from './holy-table.js';
 import { showSnackbar } from './snackbar.js';
 import { initPreview, previewContainer } from './holy-preview.js';
 
@@ -19,7 +19,7 @@ export const handleVisualize = () => {
   const viewButton = document.querySelector('.btn[data-action="view"]');
   const checkboxContainer = plotDropdown.querySelector('.checkbox-container');
 
-  createExploreColumns(getTableColumns(), 'main');
+  createExploreColumns(getTableColumnNames(), 'main');
 
   document.addEventListener('click', (event) => {
     if (event.target.classList.contains('column')) {

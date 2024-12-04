@@ -168,16 +168,43 @@ def get_dtypes():
 @app.route('/reformat', methods=['POST'])
 def reformat():
     data = request.get_json()
-    table_data = data['tableData']
-    column = data['column']
-    type = data['type']
+    table_data = data.get('tableData', [])
+    column = data.get('column')
+    target_type = data.get('type')
+
+    if not table_data or column is None or target_type is None:
+        return jsonify({"error": "Invalid input data"}), 400
 
     df = pd.DataFrame(table_data)
-    df[column] = df[column].astype(type)
+
+    if column not in df.columns:
+        return jsonify({"error": f"Column '{column}' not found in table data"}), 400
+
+    try:
+        if target_type == "int":
+            df[column] = pd.to_numeric(df[column], errors='coerce').fillna(0).astype(int)
+        elif target_type == "float":
+            df[column] = pd.to_numeric(df[column], errors='coerce').astype(float)
+        elif target_type == "str":
+            df[column] = df[column].astype(str)
+        elif target_type == "date":
+            df[column] = pd.to_datetime(df[column], errors='coerce')
+        else:
+            return jsonify({"error": f"Unsupported type '{target_type}'"}), 400
+        
+        df[column] = df[column].apply(lambda col: None if pd.isna(col) else col)
+
+    except Exception as e:
+        return jsonify({"error": f"Failed to convert column '{column}' to type '{target_type}': {str(e)}"}), 500
 
     reformatted_data = df.to_dict(orient='records')
+    print(reformatted_data)
 
-    return jsonify({ 'reformattedData': reformatted_data , 'columnAffected': column , 'newType': type })
+    return jsonify({
+        'reformattedData': reformatted_data,
+        'columnAffected': column,
+        'newType': target_type
+    })
 
 
 @app.route('/upload', methods=['POST'])
@@ -266,8 +293,7 @@ def merge_data():
         return jsonify({'message': f'Invalid merge method: {merge_method}'}), 400
 
     merged_data_json = merged_df.to_json(orient='records')
-
-
+    
     return jsonify({
         'message': 'Merge operation successful',
         'mergedData': merged_data_json
@@ -296,12 +322,16 @@ def join_data():
     if axis not in ['vertically', 'horizontally']:
         return jsonify({'message': 'Invalid axis specified'}), 400
 
-    
-
     if axis == 'vertically':
-        joined_df = pd.concat([table_df, file_df], axis=0)
+        joined_df = pd.concat([table_df, file_df], axis=0, ignore_index=True)
     elif axis == 'horizontally':
         joined_df = handle_overlapping_columns(table_df, file_df, axis=1)
+
+    id_columns = [col for col in joined_df.columns if 'id' in col.lower()]
+
+    if id_columns:
+        joined_df = joined_df.sort_values(by=id_columns[0], ascending=True)
+
 
     joined_data_json = joined_df.to_json(orient='records')
 

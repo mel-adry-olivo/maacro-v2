@@ -1,6 +1,8 @@
 import { handleDeduplicate } from './holy-deduplicate.js';
 import { previewContainer } from './holy-preview.js';
-import { createTable } from './holy-table.js';
+import { initHeaders } from './holy-revise.js';
+import { createTable, setTableColumns } from './holy-table.js';
+import { getColumnsState } from './state.js';
 
 export const initPageOverlay = (pageOverlay) => {
   pageOverlay.addEventListener('click', (e) => {
@@ -38,6 +40,13 @@ export function updateTableUI(
   if (affectedRows) {
     affectedRows.textContent = rowsAffected + ' rows affected';
   }
+
+  if (tableContainer.classList.contains('table-main')) {
+    initHeaders();
+    if (JSON.stringify(getColumnsState()) !== '{}') {
+      setTableColumns(getColumnsState());
+    }
+  }
 }
 
 export function updateTableDataType({ data, columnName, newType }, tableContainer) {
@@ -65,5 +74,9 @@ export function updateTableDataType({ data, columnName, newType }, tableContaine
         cell.textContent = parsedValue.toFixed(1);
       }
     });
+  }
+
+  if (tableContainer.classList.contains('table-main')) {
+    initHeaders();
   }
 }

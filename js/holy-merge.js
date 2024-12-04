@@ -76,6 +76,12 @@ export const handleMerge = () => {
     formData.append('mergeMethod', mergeMethod);
 
     const data = await fetchMergedData(formData);
+
+    if (data.length <= 0) {
+      showSnackbar('Merge', 'No data to merge.', 3000);
+      return;
+    }
+
     updateTableUI({ data: data }, previewTableContainer);
     show(previewContainer);
   });
@@ -97,6 +103,12 @@ export const handleMerge = () => {
     formData.append('mergeMethod', mergeMethod);
 
     const data = await fetchMergedData(formData);
+
+    if (data.length <= 0) {
+      showSnackbar('Merge', 'No data to merge.', 3000);
+      return;
+    }
+
     updateTableUI({ data: data }, mainTable, mainTotalRows);
     show(pageOverlay);
     showSnackbar('Join', 'Data merged successfully.', 3000);

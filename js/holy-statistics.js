@@ -1,5 +1,5 @@
 import { show, hide, updateTableUI } from './utils.js';
-import { getTableColumns, getTableData } from './holy-table.js';
+import { getTableColumnNames, getTableData } from './holy-table.js';
 import { showSnackbar } from './snackbar.js';
 import { initPreview, previewContainer, previewTableContainer } from './holy-preview.js';
 
@@ -18,7 +18,7 @@ export const handleStatistics = () => {
   const viewButton = document.querySelector('.btn[data-action="view"]');
   const checkboxContainer = statisticsDropdown.querySelector('.checkbox-container');
 
-  createExploreColumns(getTableColumns(), 'main');
+  createExploreColumns(getTableColumnNames(), 'main');
 
   document.addEventListener('click', (event) => {
     if (event.target.classList.contains('column')) {

@@ -3,6 +3,7 @@ import { getTableData } from './holy-table.js';
 import { showSnackbar } from './snackbar.js';
 import { initPreview, previewContainer, previewTableContainer } from './holy-preview.js';
 import { initHeaders } from './holy-revise.js';
+import { initializeColumnsState } from './state.js';
 
 const pageOverlay = document.querySelector('.page-overlay');
 const mainTotalRows = document.querySelector('.total-rows');
@@ -70,6 +71,6 @@ export const handleUpload = () => {
     uploadContainer.remove();
     dropdownGroup.classList.remove('hidden');
     fileContainer.classList.remove('hidden');
-    initHeaders();
+    initializeColumnsState();
   });
 };

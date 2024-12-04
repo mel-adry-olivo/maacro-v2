@@ -51,11 +51,15 @@ def cleanse():
 
     data = request.form
     table = data.get('tableData')
-    df = pd.read_json(table).replace('', pd.NA).convert_dtypes()
+ 
+    json_data = StringIO(table)
+    df = pd.read_json(json_data)
+    df = df.replace('', pd.NA)
+    df = df.convert_dtypes()
 
     for column in df.columns:
-        if not df[column].dtype.name in ['object', 'string'] or df[column].str.isnumeric().all():
-            df[column] = pd.to_numeric(df[column], errors='coerce')
+        #if not df[column].dtype.name in ['object', 'string'] or df[column].str.isnumeric().all():
+        df[column] = pd.to_numeric(df[column], errors='coerce')
 
     optionsDict = json.loads(data.get('options'))
     missing_options = optionsDict['missingOptions']
@@ -67,39 +71,26 @@ def cleanse():
 
     if 'formatDate' in tools_options:
         column = tools_options['formatDate']['column']
-        try:
-            df[column] = pd.to_datetime(df[column], errors='coerce')
-            df[column] = df[column].apply(lambda x: x.strftime('%m/%d/%Y') if pd.notnull(x) else '')
-           
-        except Exception as e:
-            return jsonify({'error': f'Date formatting failed: {str(e)}'}), 500
-
+        df[column] = pd.to_datetime(df[column], errors='coerce')
+        df[column] = df[column].apply(lambda x: x.strftime('%m/%d/%Y') if pd.notnull(x) else '')
+        
     if 'standardizeColumns' in tools_options and tools_options['standardizeColumns']:
-        try:
-           df.columns = df.columns.str.strip().str.lower().str.replace(' ', '_')
-        except Exception as e:
-            return jsonify({'error': f'Column standardization failed: {str(e)}'}), 500
-
+        df.columns = df.columns.str.strip().str.lower().str.replace(' ', '_')
 
     if 'dropOutliers' in tools_options:
         column = tools_options['dropOutliers']['column']
         method = tools_options['dropOutliers']['method']
-        if column not in df.columns:
-            return jsonify({'error': f'Column "{column}" not found'}), 400
-        try:
-            if method == 'iqr':
-                Q1 = df[column].quantile(0.25)
-                Q3 = df[column].quantile(0.75)
-                IQR = Q3 - Q1
-                df = df[~((df[column] < (Q1 - 1.5 * IQR)) | (df[column] > (Q3 + 1.5 * IQR)))]
-            elif method == 'zscore':
-                mean = df[column].mean()
-                std = df[column].std()
-                df = df[~((df[column] - mean).abs() > 3 * std)]
-            else:
-                return jsonify({'error': 'Invalid outlier detection method'}), 400
-        except Exception as e:
-            return jsonify({'error': f'Outlier detection failed: {str(e)}'}), 500
+
+        if method == 'iqr':
+            Q1 = df[column].quantile(0.25)
+            Q3 = df[column].quantile(0.75)
+            IQR = Q3 - Q1
+            df = df[~((df[column] < (Q1 - 1.5 * IQR)) | (df[column] > (Q3 + 1.5 * IQR)))]
+
+        elif method == 'zscore':
+            mean = df[column].mean()
+            std = df[column].std()
+            df = df[~((df[column] - mean).abs() > 3 * std)]
 
     cleaned_data = df.to_dict(orient='records')
     rows_affected = original_rows - len(df)
@@ -109,12 +100,11 @@ def cleanse():
     })
 
 def handleMissingData(df, options):
-    df = df.replace('', pd.NA) 
     methods = {
         'drop-rows': lambda df: df.dropna(),
         'default-value': lambda df, column, value: df.fillna({column: value}),
         'impute': {
-            'mean': lambda df: df.fillna(df.mean()),
+            'mean': lambda df: df.fillna(df.mean().round()),
             'median': lambda df: df.fillna(df.median()),
             'mode': lambda df: df.fillna(df.mode().iloc[0])
         }
@@ -122,7 +112,6 @@ def handleMissingData(df, options):
     
     if options['method'] == 'impute':
         column = options['column']
-        df[column] = df[column].astype('float64')
         return methods['impute'][options['methodValue']](df)
     elif options['method'] == 'default-value':
         column = options['column']
@@ -136,9 +125,7 @@ def handleMissingData(df, options):
 def get_dtypes():
     data = request.get_json()
     column_values = data['values']
-
     type = pd.api.types.infer_dtype(column_values)
-
     return jsonify({ 'type': type })
 
 @app.route('/reformat', methods=['POST'])

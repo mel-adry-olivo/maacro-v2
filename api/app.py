@@ -50,16 +50,12 @@ def deduplicate():
 def cleanse():
 
     data = request.form
-    table = data.get('tableData')
- 
-    json_data = StringIO(table)
-    df = pd.read_json(json_data)
-    df = df.replace('', pd.NA)
-    df = df.convert_dtypes()
+    table = data.get('tableData') 
+    df = pd.read_json(table).replace('', pd.NA).convert_dtypes()
 
     for column in df.columns:
-        #if not df[column].dtype.name in ['object', 'string'] or df[column].str.isnumeric().all():
-        df[column] = pd.to_numeric(df[column], errors='coerce')
+        if not df[column].dtype.name in ['object', 'string'] or df[column].str.isnumeric().all():
+            df[column] = pd.to_numeric(df[column], errors='coerce')
 
     optionsDict = json.loads(data.get('options'))
     missing_options = optionsDict['missingOptions']
@@ -121,12 +117,6 @@ def handleMissingData(df, options):
         return methods[options['method']](df)
 
 
-@app.route('/dtypes', methods=['POST'])
-def get_dtypes():
-    data = request.get_json()
-    column_values = data['values']
-    type = pd.api.types.infer_dtype(column_values)
-    return jsonify({ 'type': type })
 
 @app.route('/reformat', methods=['POST'])
 def reformat():
@@ -135,31 +125,17 @@ def reformat():
     column = data.get('column')
     target_type = data.get('type')
 
-    if not table_data or column is None or target_type is None:
-        return jsonify({"error": "Invalid input data"}), 400
-
     df = pd.DataFrame(table_data)
 
-    if column not in df.columns:
-        return jsonify({"error": f"Column '{column}' not found in table data"}), 400
-
-    try:
-        if target_type == "int":
-            df[column] = pd.to_numeric(df[column], errors='coerce').fillna(0).astype(int)
-        elif target_type == "float":
-            df[column] = pd.to_numeric(df[column], errors='coerce').astype(float)
-        elif target_type == "str":
-            df[column] = df[column].astype(str)
-        elif target_type == "date":
-            df[column] = pd.to_datetime(df[column], errors='coerce')
-        else:
-            return jsonify({"error": f"Unsupported type '{target_type}'"}), 400
-        
-        df[column] = df[column].apply(lambda col: None if pd.isna(col) else col)
-
-    except Exception as e:
-        return jsonify({"error": f"Failed to convert column '{column}' to type '{target_type}': {str(e)}"}), 500
-
+    if target_type == "int":
+        df[column] = pd.to_numeric(df[column], errors='coerce').fillna(0).astype(int)
+    elif target_type == "float":
+        df[column] = pd.to_numeric(df[column], errors='coerce').astype(float)
+    elif target_type == "str":
+        df[column] = df[column].astype(str)
+    elif target_type == "date":
+        df[column] = pd.to_datetime(df[column], errors='coerce')
+    
     reformatted_data = df.to_dict(orient='records')
 
     return jsonify({
@@ -172,9 +148,6 @@ def reformat():
 @app.route('/upload', methods=['POST'])
 def upload_file():
     file = request.files.get('file')
-    if not file or file.filename == '':
-        return jsonify({'message': 'No selected file'}), 400
-
 
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
     os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)  # Ensure the upload folder exists
@@ -193,10 +166,7 @@ def upload_file():
     table_df = None
     
     if table_data:
-        try:
-            table_df = pd.DataFrame.from_records(eval(table_data))  
-        except Exception as e:
-            return jsonify({'message': 'Invalid tableData format', 'error': str(e)}), 400
+        table_df = pd.DataFrame.from_records(eval(table_data))  
 
     try:
         if file.filename.endswith('.csv'):
@@ -211,6 +181,7 @@ def upload_file():
     df.fillna('', inplace=True)
 
     matching_columns = []
+    
     if table_df is not None:
         matching_columns = list(set(df.columns).intersection(set(table_df.columns)))
 
@@ -230,8 +201,7 @@ def merge_data():
     
     file = request.files['file']
     table_data = request.form.get('tableData')
-    json_data = StringIO(table_data)
-    table_df = pd.read_json(json_data)
+    table_df = pd.read_json(table_data)
 
     if file.filename.endswith('.csv'):
         file_df = pd.read_csv(file)
@@ -239,9 +209,6 @@ def merge_data():
         file_df = pd.read_excel(file)
 
     merge_column = request.form.get('column')
-    if merge_column not in file_df.columns or merge_column not in table_df.columns:
-        return jsonify({'message': f'Column {merge_column} not found in both datasets'}), 400
-
     merge_method = request.form.get('mergeMethod')
 
     if merge_method == 'inner':
@@ -252,8 +219,6 @@ def merge_data():
         merged_df = pd.merge(table_df, file_df, on=merge_column, how='left')
     elif merge_method == 'right':
         merged_df = pd.merge(table_df, file_df, on=merge_column, how='right')
-    else:
-        return jsonify({'message': f'Invalid merge method: {merge_method}'}), 400
 
     merged_data_json = merged_df.to_json(orient='records')
     
@@ -267,24 +232,16 @@ def merge_data():
 def join_data():
     file = request.files.get('file')
     table_data = request.form.get('tableData')
-    json_data = StringIO(table_data)
-    table_df = pd.read_json(json_data)
-
-    if not file or not table_data:
-        return jsonify({'message': 'Missing file or table data'}), 400
+    table_df = pd.read_json(table_data)
 
     if file.filename.endswith('.csv'):
         file_df = pd.read_csv(file)
     elif file.filename.endswith('.xlsx'):
         file_df = pd.read_excel(file)
-    else:
-        return jsonify({'message': 'Unsupported file format'}), 400
+
 
     axis = request.form.get('selectedAxis')
     
-    if axis not in ['vertically', 'horizontally']:
-        return jsonify({'message': 'Invalid axis specified'}), 400
-
     if axis == 'vertically':
         joined_df = pd.concat([table_df, file_df], axis=0, ignore_index=True)
     elif axis == 'horizontally':
@@ -294,7 +251,6 @@ def join_data():
 
     if id_columns:
         joined_df = joined_df.sort_values(by=id_columns[0], ascending=True)
-
 
     joined_data_json = joined_df.to_json(orient='records')
 
@@ -316,17 +272,12 @@ def explore_data():
     data = request.form
     table = data.get('tableData')
     json_data = StringIO(table)
-    table_df = pd.read_json(json_data)
+    table_df = pd.read_json(table).convert_dtypes()
 
-    
-    table_df = table_df.convert_dtypes()
     options = data.get('options')
     optionsDict = json.loads(options)
 
     table_df = table_df.replace('', pd.NA) 
-    # for col in table_df.columns:
-    #     table_df[col] = pd.to_numeric(table_df[col], errors='coerce')
-
 
     variables = optionsDict['variables']
     splits = optionsDict['splits']
@@ -345,7 +296,7 @@ def explore_data():
                 'error': f"Cannot use continuous data as splits: {invalid_splits}"
             }), 400
 
-        agg_dict = {}
+        agg_dict = {} #aggregation funcs
         
         for var in variables:
             stats_list = []
@@ -392,8 +343,6 @@ def visualize_data():
 
     df = pd.read_json(json_data)
     df = df.convert_dtypes()
-
-    # df = df.apply(pd.to_numeric, errors='coerce')
     
     try:
         plot_images = {}

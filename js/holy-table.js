@@ -5,6 +5,20 @@ export function createTable(tableData) {
   const headerHtml = headers
     .map((header) => `<th data-action="format-revise" data-type="str">${header}</th>`)
     .join('');
+
+
+    if (tableData.length === 0) {
+      return `
+        <table>
+          <thead>
+            <tr>${headerHtml}</tr>
+          </thead>
+          <tbody>
+            <tr><td colspan="${headers.length}" class="empty-table">No data available</td></tr>
+          </tbody>
+        </table>`;
+    }
+
   const rowHtml = tableData
     .map(
       (row) =>
